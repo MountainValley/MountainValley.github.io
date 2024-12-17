@@ -52,6 +52,7 @@ MySQL中的事务ID从开始到提交之前这段时间会被保存到一个全�
 
 #### Read View 结构
 Read View数据结构中几个比较重要的成员
+
 | 成员           | 描述                                                                                                |
 | -------------- | --------------------------------------------------------------------------------------------------- |
 | low_limit_id   | 低限制事务 ID：所有事务 ID 小于 low_limit_id 的事务都已提交，其产生的修改对当前事务可见。           |
@@ -74,7 +75,7 @@ rollback segment中的undo logs分为两类，分别是insert undo logs和update
 
 #### MVCC快照读具体流程
 
-<img src="/assets/images/mvcc/MySQL MVCC 快照读详细流程图.png" alt="MVCC 快照读具体流程" style="zoom:87%;" />
+<img src="/assets/images/mvcc/MySQL_MVCC_SEQUENCE.png" alt="MVCC 快照读具体流程" style="zoom:87%;" />
 
 #### MVCC可见性判断算法
 
