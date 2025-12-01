@@ -10,90 +10,94 @@ Elasticsearch 分析器主要包括 三个核心组件：
 
 ## 常用内置组件介绍
 ### 字符过滤器 (Char Filter)
-1. html_strip ： 移除 HTML 或 XML 标签，保留文本内容。
-2. mapping ： 将特定字符或字符序列替换为其他字符或序列。不过需要提供一个映射文件或映射列表。
-  示例：
+1. ```html_strip``` ： 移除 HTML 或 XML 标签，保留文本内容。
+2. ```mapping``` ： 将特定字符或字符序列替换为其他字符或序列。不过需要提供一个映射文件或映射列表。示例：
   
-  ```json
-    PUT /example_index
-    {
-    "settings": {
-        "analysis": {
-        "char_filter": {
-            "my_mapping": {
-            "type": "mapping",
-            "mappings": [
-                "cat => dog",
-                "rat => mouse"
-            ]
-            }
-        },
-        "analyzer": {
-            "custom_mapping_analyzer": {
-            "type": "custom",
-            "char_filter": ["my_mapping"],
-            "tokenizer": "standard"
-            }
-        }
-        }
-    }
-    }
-  ```
-3. pattern_replace ：基于正则表达式匹配字符，并用替换字符串替换匹配到的字符。
-  配置参数：
-    pattern：正则表达式。
-    replacement：替换的字符串
+    ```json
+      PUT /example_index
+      {
+      "settings": {
+          "analysis": {
+          "char_filter": {
+              "my_mapping": {
+              "type": "mapping",
+              "mappings": [
+                  "cat => dog",
+                  "rat => mouse"
+              ]
+              }
+          },
+          "analyzer": {
+              "custom_mapping_analyzer": {
+              "type": "custom",
+              "char_filter": ["my_mapping"],
+              "tokenizer": "standard"
+              }
+          }
+          }
+      }
+      }
+    ```
+3. ```pattern_replace``` ：基于正则表达式匹配字符，并用替换字符串替换匹配到的字符。
+   
+    配置参数：  
+      - pattern：正则表达式。  
+      - replacement：替换的字符串
+  
+    示例：
     ```json
         PUT /example_index
         {
-        "settings": {
-            "analysis": {
-            "char_filter": {
-                "my_pattern_replace": {
-                "type": "pattern_replace",
-                "pattern": "dog",
-                "replacement": "cat"
+          "settings": {
+              "analysis": {
+                "char_filter": {
+                    "my_pattern_replace": {
+                    "type": "pattern_replace",
+                    "pattern": "dog",
+                    "replacement": "cat"
+                    }
+                },
+                "analyzer": {
+                    "custom_pattern_analyzer": {
+                    "type": "custom",
+                    "char_filter": ["my_pattern_replace"],
+                    "tokenizer": "standard"
+                    }
                 }
-            },
-            "analyzer": {
-                "custom_pattern_analyzer": {
-                "type": "custom",
-                "char_filter": ["my_pattern_replace"],
-                "tokenizer": "standard"
-                }
-            }
-            }
-        }
+              }
+          }
         }
     ```
 ### 分词器（Tokenizer）
-1. Standard Tokenizer
+1. Standard Tokenizer  
 默认分词器，基于 Unicode 文本分割标准。
 按照单词进行分割，去除标点符号和空白字符。
 会将大写字母转换为小写（标准化）。
-适用场景：英文、简单西方语言。
-2. Whitespace Tokenizer
+适用场景：英文、简单西方语言。使用标准分词器处理中文时输出的是一个个的汉字，而无法识别词语。
+
+2. Whitespace Tokenizer  
 根据空格分割文本。
 不进行任何大小写转换或标点符号处理。
 示例：
 输入：Hello World!
 输出：Hello、World!
-3. Keyword Tokenizer
+
+3. Keyword Tokenizer  
 不分割文本，将整个输入当作一个单独的 token。
 示例：
 输入：Hello World!
 输出：Hello World!
-4. Letter Tokenizer
+1. Letter Tokenizer
 将非字母字符作为分隔符进行分割。
 示例：
 输入：Hello123World
 输出：Hello、World
-5. Lowercase Tokenizer
+1. Lowercase Tokenizer
 和 Letter Tokenizer 类似，但会将所有字符转换为小写。
 示例：
 输入：Hello123WORLD
 输出：hello、world
-6. Pattern Tokenizer
+1. Pattern Tokenizer
 使用 正则表达式 进行分割。
 默认正则：\W+，即非单词字符（如空格、标点等）。
 示例：
@@ -101,7 +105,7 @@ Elasticsearch 分析器主要包括 三个核心组件：
 输出：Hello、World、123
 可配置参数：
 pattern：自定义正则表达式。
-7. NGram Tokenizer
+1. NGram Tokenizer
 将输入文本拆分为 固定长度的子字符串（N-Grams）。
 配置参数：
 min_gram：最小子串长度（默认 1）。
@@ -109,7 +113,7 @@ max_gram：最大子串长度（默认 2）。
 示例：
 输入：hello，min_gram=2，max_gram=3
 输出：he、hel、el、ell、ll、llo
-8. Edge NGram Tokenizer
+1. Edge NGram Tokenizer
 从文本 开头 开始拆分成 N-Gram 子字符串，适合前缀匹配。
 配置参数：
 min_gram：最小子串长度。
@@ -117,13 +121,13 @@ max_gram：最大子串长度。
 示例：
 输入：hello，min_gram=2，max_gram=3
 输出：he、hel
-9. UAX-29 URL Email Tokenizer
+1. UAX-29 URL Email Tokenizer
 基于 Unicode Text Segmentation 标准（UAX #29）。
 专门处理 URL 和 Email。
 示例：
 输入：user@example.com
 输出：user@example.com
-10. Path Hierarchy Tokenizer
+1.  Path Hierarchy Tokenizer
 适用于路径分割，主要用于文件系统路径或分层数据。
 示例：
 输入：/a/b/c
@@ -132,16 +136,16 @@ max_gram：最大子串长度。
 delimiter：路径分隔符（默认 /）。
 replacement：替换分隔符（可选）。
 skip：跳过的层级（默认 0）。
-11. Char Group Tokenizer
+1.  Char Group Tokenizer
 按照指定的字符分组分割文本。
 示例：
 配置：tokenize_on_chars: ["whitespace", "punctuation"]
 输入：Hello, world!
 输出：Hello、world
-12. Classic Tokenizer
+1.  Classic Tokenizer
 适用于旧版本 Lucene 分词器，主要针对英文文本。
 和 Standard Tokenizer 类似，但处理更加简单，移除了一些复杂的 Unicode 处理。
-13. Simple Pattern Tokenizer
+1.  Simple Pattern Tokenizer
 使用 简单正则表达式 进行文本分割。
 与 Pattern Tokenizer 不同，使用更简单的正则表达式引擎。
 示例：
